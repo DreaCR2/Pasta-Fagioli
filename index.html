@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pasta Fagioli</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf6f0; --card: #ffffff; --ink: #2b2420; --muted: #7a6d63;
+    --line: #e8dfd4; --accent: #b5452b; --accent-ink: #ffffff; --soft: #f3ebe1;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #1b1715; --card: #251f1c; --ink: #f1e9e1; --muted: #a8988b;
+      --line: #3a312c; --accent: #e0714f; --accent-ink: #1b1715; --soft: #2e2622; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+    font: 16px/1.6 Inter, system-ui, sans-serif; }
+  main { max-width: 680px; margin: 0 auto; padding: 40px 16px 64px; }
+  h1, h2 { font-family: Fraunces, Georgia, serif; line-height: 1.15; }
+  h1 { font-size: clamp(2.2rem, 7vw, 3.2rem); margin: 0 0 8px; }
+  h2 { font-size: 1.5rem; margin: 40px 0 12px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+  .chip { background: var(--soft); color: var(--muted); border-radius: 999px;
+    padding: 2px 12px; font-size: .85rem; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; }
+  button { font: inherit; cursor: pointer; border: 1px solid var(--line); background: var(--card);
+    color: var(--ink); border-radius: 8px; padding: 6px 12px; }
+  button:hover:not(:disabled) { border-color: var(--accent); }
+  button:disabled { opacity: .4; cursor: default; }
+  button.cta { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
+  .bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .bar .sv { min-width: 96px; text-align: center; font-weight: 600; }
+  .bar .count { margin-left: auto; color: var(--muted); font-size: .9rem; }
+  .ing label { display: flex; gap: 10px; align-items: baseline; padding: 5px 0; cursor: pointer;
+    border-bottom: 1px dashed var(--line); }
+  .ing label:last-child { border-bottom: 0; }
+  .ing input { accent-color: var(--accent); transform: translateY(2px); }
+  .ing .done { opacity: .45; text-decoration: line-through; }
+  ol.dir { padding-left: 22px; } ol.dir li { margin-bottom: 10px; }
+  .muted { color: var(--muted); font-size: .9rem; font-style: italic; }
+  .tip { background: var(--soft); border-left: 4px solid var(--accent); border-radius: 8px; padding: 12px 16px; margin-top: 24px; }
+  .tip p { margin: 0 0 8px; } .tip p:last-child { margin: 0; }
+  .cook .head { color: var(--muted); font-size: .85rem; }
+  .cook .title { font-family: Fraunces, Georgia, serif; font-size: 1.4rem; font-weight: 700; margin: 2px 0 8px; }
+  .cook .clock { font-size: 2.2rem; font-weight: 700; font-variant-numeric: tabular-nums; min-width: 110px; }
+  .cook .clock.fin { color: var(--accent); }
+  .cook .nav { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
+  .cook .dots { flex: 1; text-align: center; letter-spacing: 4px; color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Pasta Fagioli</h1>
+  <div class="meta"><span class="chip">45 min</span><span class="chip">One pot</span><span class="chip">Dutch oven, 5–6 qt</span></div>
+
+  <h2>Ingredients</h2>
+  <div class="card ing">
+    <div class="bar">
+      <button id="minus" aria-label="Fewer servings">−</button>
+      <span class="sv" id="sv"></span>
+      <button id="plus" aria-label="More servings">+</button>
+      <button id="uncheck">Uncheck all</button>
+      <span class="count" id="count"></span>
+    </div>
+    <div id="list"></div>
+  </div>
+
+  <h2>Directions</h2>
+  <div class="muted" id="dirnote"></div>
+  <ol class="dir" id="dir"></ol>
+  <div class="tip">
+    <p><strong>Good to know:</strong> The pasta keeps absorbing broth, so leftovers get thick. Add a splash of water when reheating, or cook the pasta separately and add it per bowl.</p>
+    <p>On the stove: an oval Dutch oven can go on the long center burner if the flame covers most of the base. If it's barely sizzling after a few minutes, move it to the largest round burner and stir now and then.</p>
+  </div>
+
+  <h2>Cook Mode</h2>
+  <div class="card cook">
+    <div class="head" id="chead"></div>
+    <div class="title" id="ctitle"></div>
+    <div id="cbody"></div>
+    <div class="bar" id="timer" style="margin-top:12px">
+      <span class="clock" id="clock"></span>
+      <button class="cta" id="start"></button>
+      <button id="reset">Reset</button>
+    </div>
+    <div class="nav">
+      <button id="prev">← Back</button>
+      <span class="dots" id="dots"></span>
+      <button id="next">Next →</button>
+    </div>
+  </div>
+</main>
+<script>
+const KEY = "pasta-fagioli", BASE = 4;
+const ING = [
+  {a:2, u:"tbsp", n:"olive oil"},
+  {a:1, n:"medium onion, diced", p:"medium onions, diced", s:"medium onion", sp:"medium onions"},
+  {a:2, n:"carrot, diced", p:"carrots, diced", s:"carrot", sp:"carrots"},
+  {a:2, n:"celery stalk, diced", p:"celery stalks, diced", s:"celery stalk", sp:"celery stalks"},
+  {a:3, n:"garlic clove, minced", p:"garlic cloves, minced"},
+  {a:2, u:"tbsp", n:"tomato paste"},
+  {a:1, u:"tsp", n:"Italian seasoning"},
+  {a:0.25, u:"tsp", n:"red pepper flakes (optional)", s:"red pepper flakes"},
+  {a:1, u:"can", n:"crushed or diced tomatoes (14.5 oz)", s:"tomatoes"},
+  {a:2, u:"can", n:"cannellini beans (15 oz), drained and rinsed", s:"cannellini beans"},
+  {a:6, u:"cup", n:"chicken or vegetable broth", s:"broth"},
+  {a:1, n:"Parmesan rind (optional)", p:"Parmesan rinds (optional)", s:"Parmesan rind", sp:"Parmesan rinds"},
+  {a:1, u:"cup", n:"ditalini or other small pasta", s:"pasta"},
+  {a:1, u:"tsp", n:"salt, to taste", s:"salt"},
+  {a:0.5, u:"tsp", n:"black pepper, to taste", s:"pepper"},
+  {a:0.5, u:"cup", n:"grated Parmesan, for serving", s:"grated Parmesan"}
+];
+const DIR = [
+  {t:"Soften the veggies (8 min).", c:"Heat {0} in the Dutch oven over medium. Add {1}, {2}, and {3}, all diced, and cook, stirring occasionally, until soft."},
+  {t:"Build flavor (1–2 min).", c:"Stir in {4}, {5}, {6}, and {7}. Cook until fragrant and the paste darkens a bit."},
+  {t:"Simmer the base (15 min).", c:"Add {8}, {9} (drained and rinsed), {10}, and {11}. Mash about a third of the beans against the side of the pot to thicken the soup. Bring to a boil, then lower the heat and simmer."},
+  {t:"Cook the pasta (10 min).", c:"Stir in {12} and simmer, stirring now and then, until tender."},
+  {t:"Finish.", c:"Pull out the rind, season with about {13} and {14} (to taste), and top bowls with {15}."}
+];
+const STEPS = [
+  {t:"Soften the veggies", s:480, c:DIR[0].c},
+  {t:"Build flavor", s:90, c:DIR[1].c},
+  {t:"Simmer the base", s:900, c:DIR[2].c},
+  {t:"Cook the pasta", s:600, c:DIR[3].c},
+  {t:"Finish", s:0, c:DIR[4].c}
+];
+
+const ls = {
+  get(k, d) { try { const v = localStorage.getItem(KEY + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(KEY + k, JSON.stringify(v)); } catch (e) {} }
+};
+function fmt(x) {
+  const whole = Math.floor(x + 1e-9), r = x - whole;
+  const fr = [[0,""],[0.125,"⅛"],[0.25,"¼"],[1/3,"⅓"],[0.5,"½"],[2/3,"⅔"],[0.75,"¾"],[1,""]];
+  let best = fr[0];
+  for (const f of fr) if (Math.abs(r - f[0]) < Math.abs(r - best[0])) best = f;
+  const w = whole + (best[0] === 1 ? 1 : 0);
+  return ((w ? String(w) : "") + best[1]) || "⅛";
+}
+function qty(it) {
+  const amt = it.a * servings / BASE, many = amt > 1.0001;
+  const unit = it.u ? " " + it.u + (many && (it.u === "can" || it.u === "cup") ? "s" : "") : "";
+  return { q: fmt(amt) + unit, many };
+}
+function full(it) { const {q, many} = qty(it); return "<strong>" + q + "</strong> " + ((it.p && many) ? it.p : it.n); }
+function short(it) {
+  const {q, many} = qty(it);
+  const name = it.s ? ((it.sp && many) ? it.sp : it.s) : ((it.p && many) ? it.p : it.n);
+  return "<strong>" + q + "</strong> " + name;
+}
+const $ = id => document.getElementById(id);
+const fill = (c, f) => c.replace(/\{(\d+)\}/g, (m, k) => f(ING[+k]));
+
+let servings = ls.get("-servings", BASE);
+let checked = new Set(ls.get("-checked", []));
+
+function renderIng() {
+  $("sv").textContent = servings + (servings === 1 ? " serving" : " servings");
+  const list = $("list"); list.innerHTML = "";
+  ING.forEach((it, i) => {
+    const row = document.createElement("label");
+    const cb = document.createElement("input"); cb.type = "checkbox"; cb.checked = checked.has(i);
+    const txt = document.createElement("span"); txt.innerHTML = full(it);
+    txt.className = cb.checked ? "done" : "";
+    cb.onchange = () => {
+      cb.checked ? checked.add(i) : checked.delete(i);
+      ls.set("-checked", [...checked]);
+      txt.className = cb.checked ? "done" : "";
+      updateCount();
+    };
+    row.append(cb, txt); list.appendChild(row);
+  });
+  updateCount();
+}
+function updateCount() { $("count").textContent = checked.size + " / " + ING.length + " ready"; }
+function renderDir() {
+  $("dirnote").textContent = "Amounts for " + servings + (servings === 1 ? " serving." : " servings.");
+  $("dir").innerHTML = DIR.map(d => "<li><strong>" + d.t + "</strong> " + fill(d.c, short) + "</li>").join("");
+}
+
+let idx = 0, remaining = STEPS[0].s, timerId = null;
+function mmss(sec) { return Math.floor(sec / 60) + ":" + String(sec % 60).padStart(2, "0"); }
+function beep() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [0, .35, .7].forEach(d => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination); o.frequency.value = 880; g.gain.value = .2;
+      o.start(ctx.currentTime + d); o.stop(ctx.currentTime + d + .2);
+    });
+    setTimeout(() => ctx.close(), 1500);
+  } catch (e) {}
+}
+function stop() { clearInterval(timerId); timerId = null; }
+function updateTimer() {
+  const st = STEPS[idx];
+  $("timer").style.display = st.s ? "flex" : "none";
+  const c = $("clock");
+  c.textContent = remaining > 0 ? mmss(remaining) : "Done!";
+  c.className = "clock" + (remaining > 0 ? "" : " fin");
+  $("start").textContent = timerId ? "Pause" : (remaining < st.s && remaining > 0 ? "Resume" : "Start timer");
+  $("start").disabled = remaining <= 0;
+}
+function renderCook() {
+  const st = STEPS[idx];
+  $("chead").textContent = "Step " + (idx + 1) + " of " + STEPS.length + " · " + servings + (servings === 1 ? " serving" : " servings");
+  $("ctitle").textContent = st.t;
+  $("cbody").innerHTML = fill(st.c, short);
+  $("dots").textContent = STEPS.map((_, i) => i === idx ? "●" : "○").join("");
+  $("prev").disabled = idx === 0;
+  $("next").disabled = idx === STEPS.length - 1;
+  updateTimer();
+}
+function goTo(i) { stop(); idx = i; remaining = STEPS[idx].s; renderCook(); }
+$("start").onclick = () => {
+  if (timerId) { stop(); updateTimer(); return; }
+  timerId = setInterval(() => {
+    remaining--;
+    if (remaining <= 0) {
+      remaining = 0; stop(); beep();
+      document.title = "⏲ Time's up! · Pasta Fagioli";
+      setTimeout(() => { document.title = "Pasta Fagioli"; }, 10000);
+    }
+    updateTimer();
+  }, 1000);
+  updateTimer();
+};
+$("reset").onclick = () => { stop(); remaining = STEPS[idx].s; updateTimer(); };
+$("prev").onclick = () => goTo(idx - 1);
+$("next").onclick = () => goTo(idx + 1);
+
+function setServings(n) {
+  servings = Math.max(1, Math.min(16, n));
+  ls.set("-servings", servings);
+  renderIng(); renderDir(); renderCook();
+}
+$("minus").onclick = () => setServings(servings - 1);
+$("plus").onclick = () => setServings(servings + 1);
+$("uncheck").onclick = () => { checked = new Set(); ls.set("-checked", []); renderIng(); };
+
+renderIng(); renderDir(); renderCook();
+</script>
+</body>
+</html>
